@@ -1,6 +1,6 @@
 import React from 'react';
 import './Chatroom.css'
-import avatar from './avatar.jpg';
+import avatar from '../../avatar.jpg';
 
 
 class Chatroom extends React.Component {

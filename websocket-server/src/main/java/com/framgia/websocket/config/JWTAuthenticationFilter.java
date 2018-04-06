@@ -1,6 +1,7 @@
 package com.framgia.websocket.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.framgia.websocket.utils.Jwt;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,12 +53,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
-        String token = Jwts.builder()
-                .setSubject(((User) auth.getPrincipal()).getUsername())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
-                .compact();
-
+        String token = new Jwt().signDefault(((User) auth.getPrincipal()).getUsername());
         appendTokenForResponse(res, token);
     }
 
