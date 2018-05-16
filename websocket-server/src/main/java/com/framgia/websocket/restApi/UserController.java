@@ -6,7 +6,6 @@ import com.framgia.websocket.repository.UserRepository;
 import com.framgia.websocket.utils.JsonObject;
 import com.framgia.websocket.utils.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,6 @@ import static java.util.Arrays.asList;
 @RestController
 public class UserController {
 
-    public static final List<String> DEFAULT_RETURNED_FIELDS = asList("id", "name", "email");
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -34,11 +32,15 @@ public class UserController {
     }
 
     @PostMapping("/users/signup")
-    public Map<String, Object> createUser(@RequestBody User user) {
+    public Map<String, Object> createUser(@RequestBody User user) throws Exception {
+        User dbUser = this.userRepository.findByUsername(user.getUsername());
+        if (dbUser != null) {
+            throw  new Exception("User already existing");
+        }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         User savedUser = this.userRepository.save(user);
-        Map<String, Object> userMap = new JsonObject(savedUser).toJsonObject(DEFAULT_RETURNED_FIELDS);
-        userMap.put("access_token", new Jwt().signDefault(user.getName()));
+        Map<String, Object> userMap = new JsonObject<User>(savedUser).toJsonObject(asList("username", "firstName", "lastName"));
+        userMap.put("access_token", new Jwt().signDefault(user.getUsername()));
         return userMap;
     }
 

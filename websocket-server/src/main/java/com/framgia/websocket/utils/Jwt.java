@@ -17,8 +17,6 @@ public class Jwt {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
                 .compact();
-
-
     }
 
     public String parseDefault(String token) {

@@ -2,8 +2,6 @@ package com.framgia.websocket.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.framgia.websocket.utils.Jwt;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static com.framgia.websocket.constants.SecurityConstants.*;
 
@@ -38,7 +35,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            creds.getName(),
+                            creds.getUsername(),
                             creds.getPassword(),
                             new ArrayList<>())
             );

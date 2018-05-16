@@ -19,13 +19,16 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;
+    private String username;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
 
+
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "name"),
+            joinColumns = @JoinColumn(name ="username"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 

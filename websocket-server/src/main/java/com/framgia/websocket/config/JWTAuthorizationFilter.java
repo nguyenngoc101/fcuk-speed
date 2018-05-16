@@ -5,18 +5,24 @@ import com.framgia.websocket.utils.Jwt;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
+
+    private UserDetailsService userDetailsService;
 
     public JWTAuthorizationFilter(AuthenticationManager authManager) {
         super(authManager);
@@ -49,18 +55,15 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             try {
                 token = token.replace(SecurityConstants.TOKEN_PREFIX, "");
                 String user = new Jwt().parseDefault(token);
+                if (userDetailsService==null){
+                    ServletContext servletContext = request.getServletContext();
+                    WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+                    userDetailsService = webApplicationContext.getBean(UserDetailsService.class);
+                }
+                UserDetails userDetails = userDetailsService.loadUserByUsername(user);
 
                 if (user != null) {
-                    // Todo
-                    // Fixed roles for testing purpose
-                    // Implement the logic to get user's roles
-
-//                    User authenticatedUser = userRepository.findByName(user);
-//                    Set<SimpleGrantedAuthority> roles = authenticatedUser.getRoles().stream()
-//                            .map(role -> new SimpleGrantedAuthority(role.getName()))
-//                            .collect(Collectors.toSet());
-
-                    return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                    return new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
                 }
                 return null;
             } catch (Exception ex) {

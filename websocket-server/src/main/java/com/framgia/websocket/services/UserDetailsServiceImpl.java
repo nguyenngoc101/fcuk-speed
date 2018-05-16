@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.framgia.websocket.model.User appUser = userRepository.findByName(username);
+        com.framgia.websocket.model.User appUser = userRepository.findByUsername(username);
         if (appUser == null) {
             throw new UsernameNotFoundException(username);
         }
@@ -35,6 +34,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         .map(role -> new SimpleGrantedAuthority(role.getName()))
         .collect(Collectors.toSet());
 
-        return new User(appUser.getName(), appUser.getPassword(), Collections.emptyList());
+        return new User(appUser.getUsername(), appUser.getPassword(), roles);
     }
 }
